@@ -8,7 +8,11 @@ class Mensaje extends Model
 {
     public $timestamps = false;
     protected $table = 'mensajes';
-    protected $fillable = ['mensaje','fecha','usuario_id'];
+    protected $guarded = ['id'];
+
+    protected $casts = [
+    	'fecha'=>'datetime'
+    ];
 
     public function usuario() {
     	return $this->belongsTo('App\Usuario');

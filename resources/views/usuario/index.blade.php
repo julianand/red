@@ -27,20 +27,20 @@
 	</div>
 	<div ng-if="usuario" class="col-sm-9 p-3">
 		<div class="row mx-0 border rounded border-primary" style="height: 100%;">
-			<div class="col-sm-12 align-self-start border-bottom border-primary pt-2 pl-3">
+			<div class="col-sm-12 align-self-start border-bottom border-primary pt-3 pl-3" style="height: 8%;">
 				<h4>@{{usuario.name}}</h4>
 			</div>
-			<div class="col-sm-12 align-self-center">
-				
+			<div class="col-sm-12 align-self-center bg-light" style="height: 84%;" style="overflow: hidden;">
+				<div class="" ng-repeat="mensaje in conversacion.mensajes">@{{mensaje.mensaje}}</div>
 			</div>
-			<div class="col-sm-12 align-self-end border-top border-primary">
-				<form ng-submit="enviarMensaje()">
-					<div class="form-row">
-						<div class="col-sm-10 py-1 border-right border-primary">
-							<input type="text" class="form-control border-0" style="box-shadow: none;" ng-model="mensaje.mensaje">
+			<div class="col-sm-12 align-self-end border-top border-primary" style="height: 8%;">
+				<form ng-submit="enviarMensaje()" style="height: 100%;">
+					<div class="form-row align-items-center" style="height: 100%;">
+						<div class="col-sm-10 py-1 border-right border-primary" style="height: 100%;">
+							<input type="text" class="form-control border-0" style="box-shadow: none;" ng-model="mensajeInput.mensaje">
 						</div>
 						<div class="col-sm-2 text-center p-1">
-							<input type="submit" class="btn btn-link align-self-center" value="Enviar" style="text-decoration: none;" ng-disabled="!mensaje.mensaje">
+							<input type="submit" class="btn btn-link align-self-center" value="Enviar" style="text-decoration: none;" ng-disabled="!mensajeInput.mensaje">
 						</div>
 					</div>
 				</form>

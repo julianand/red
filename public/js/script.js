@@ -59,13 +59,19 @@ app.controller('LoginController', function($scope, $http) {
 		}
 });
 
-app.controller('usuarioController', function($scope, $http, $timeout) {
+app.controller('usuarioController', function($scope, $http, $timeout, $interval) {
 	$scope.mensaje = '';
 	$timeout(function() {
 		$http.get($scope.raiz+'/usuario/usuarios').then(function(response) {
 			$scope.usuarios = response.data;
 		});
 	}, 10);
+
+	function cargarConversacion() {
+		$http.get($scope.raiz+'/usuario/cargar-conversacion/'+$scope.usuario.id).then(function(response) {
+			$scope.conversacion = response.data;
+		});
+	}
 
 	//iniciar conversacion
 		$scope.usuariosRecientes = [];
@@ -75,16 +81,23 @@ app.controller('usuarioController', function($scope, $http, $timeout) {
 			if($scope.usuariosRecientes.indexOf(usuario) == -1) {
 				$scope.usuariosRecientes.push(usuario);
 			}
+
+			cargarConversacion();
 		};
 
 	//conversacion
-		$scope.mensaje = new Object();
+		$scope.mensajeInput = new Object();
 		$scope.enviarMensaje = function() {
-			$http.post($scope.raiz+'/usuario/enviar-mensaje/'+$scope.usuario.id, $scope.mensaje).then(function(response) {
-				$scope.mensaje = new Object();
+			$http.post($scope.raiz+'/usuario/enviar-mensaje/'+$scope.usuario.id, $scope.mensajeInput).then(function(response) {
+				$scope.mensajeInput = new Object();
 				$scope.errors = null;
+				cargarConversacion();
 			}, function(response) {
 				$scope.errors = response.data;
 			});
 		}
+
+		$interval(function() {
+			if($scope.usuario) cargarConversacion();
+		}, 2000);
 });

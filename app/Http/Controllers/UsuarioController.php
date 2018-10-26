@@ -9,6 +9,9 @@ use App\Http\Controllers\Controller;
 
 use App\Usuario;
 use App\Conversacion;
+use App\Mensaje;
+
+use Carbon\Carbon;
 
 class UsuarioController extends Controller
 {
@@ -32,21 +35,37 @@ class UsuarioController extends Controller
         return $usuarios_res;
     }
 
+    public function getCargarConversacion($id) {
+        return Conversacion::with('usuarios')
+                            ->with('mensajes')
+                            ->get()
+                            ->filter(function($conv) use($id) {
+                                $usr = $conv->usuarios;
+                                return $usr->contains(\Auth::user()->id)  && $usr->contains($id);
+                            })->first();
+    }
+
     public function postEnviarMensaje(Request $request, $id) {
-        $conversaciones = Conversacion::with('usuarios')->with('mensajes')->get();
-        $usuario = Usuario::find($id);
-        foreach ($conversaciones as $key => $conversacion) {
-            if($conversacion->usuarios->contains(\Auth::user()) && $conversacion->usuarios->contains($usuario)) {
-                $conversacionRes = $conversacion;
-            }
+        $conversacion = Conversacion::with('usuarios')
+                        ->with('mensajes')
+                        ->get()
+                        ->filter(function($value) use($id) {
+                            $usuarios = $value->usuarios;
+                            return $usuarios->contains(\Auth::user()->id) && $usuarios->contains($id);
+                        })->first();
+        
+        if(!$conversacion) {
+            $conversacion = new Conversacion();
+            $conversacion->save();
+            $conversacion->usuarios()->attach(\Auth::user()->id);
+            $conversacion->usuarios()->attach($id);
         }
 
-        if(!isset($conversacionRes)) {
-            $conversacionRes = new Conversacion();
-            $conversacionRes->save();
-            $conversacionRes->usuarios()->attach(\Auth::user());
-            $conversacionRes->usuarios()->attach($id);
-        }
-        return $conversacionRes;
+        $mensaje = Mensaje::create([
+            'conversacion_id'=>$conversacion->id,
+            'usuario_id'=>\Auth::user()->id,
+            'mensaje'=>$request->mensaje,
+            'hora'=>Carbon::now(),
+        ]);
     }  
 }
